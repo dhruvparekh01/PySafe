@@ -1,0 +1,3 @@
+[console_scripts]
+jiphy = jiphy.main:main
+
