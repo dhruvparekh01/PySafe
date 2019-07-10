@@ -1,4 +1,4 @@
-import jiphy
+import bitarray
 
 
 def initial_permutation(input_64bit):  #function to initially permutate the plaintext
@@ -7,6 +7,7 @@ def initial_permutation(input_64bit):  #function to initially permutate the plai
           55, 47, 39, 31, 23, 15, 7]
 
     output_64bit = []
+    output_64bit = bitarray.bitarray(output_64bit)
 
     for i in ip:
         output_64bit.append(input_64bit[i - 1])
@@ -20,6 +21,7 @@ def round_key_generator(cipherkey_64bit):
     right = cipherkey_56bit[28:]
 
     rkey = []
+    # rkey = bitarray.bitarray(rkey)
 
     for i in range(16):
         special_round = [0, 1, 8, 15]  #define special rounds where the block is shift one position on the left
@@ -43,7 +45,7 @@ def round_key_generator(cipherkey_64bit):
 
 def round_func(input_32bit, key):
     input_48bit = expansion_pbox(input_32bit)  #pass the plaintext through the expansion pbox
-    output_48bit = xor(key, input_48bit)  #xor it with the key for that round
+    output_48bit = bitarr_xor(key, input_48bit)  #xor it with the key for that round
     output_32bit = sboxes(output_48bit)  #compress the 48 bits to 32 bits by passing through the s-boxes
     final_32bit_output = permutation(output_32bit)  #finally permutate the ciphertext
 
@@ -52,6 +54,7 @@ def round_func(input_32bit, key):
 
 def expansion_pbox(input_32bit):
     output_48bit = []
+    output_48bit = bitarray.bitarray(output_48bit)
 
     e = [32, 1, 2, 3, 4, 5, 4, 5, 6, 7, 8, 9, 8, 9, 10, 11, 12, 13, 12, 13, 14, 15, 16, 17, 16, 17, 18,
          19, 20, 21, 20, 21, 22, 23, 24, 25, 24, 25, 26, 27, 28, 29, 28, 29, 30, 31, 32, 1]  #hard code the expansion p-box
@@ -65,21 +68,32 @@ def expansion_pbox(input_32bit):
 def xor(a, b):  #make a xor function so that the program has the freedom to xor two strings/ arrays and output an array
     c = []
     for i in range(len(a)):
-        if int(a[i]) ^ int(b[i]) == 1:
-            c.append('1')
+        if a[i] ^ int(b[i]) == 1:
+            c.append(1)
         else:
-            c.append('0')
+            c.append(0)
+
+    return c
+
+
+def bitarr_xor(a, b):  #make a xor function so that the program has the freedom to xor two strings/ arrays and output an array
+
+    a = bitarray.bitarray(a)
+
+    c = a ^ b
 
     return c
 
 
 def sboxes(input_48bit):
     input_48bit_array = []
+    # input_48bit_array = bitarray.bitarray(input_48bit_array)
 
     for i in range(0, 48, 6):
         input_48bit_array.append(input_48bit[i:i + 6])  #create 8 blocks of 6 bit each
 
     output_32bit_array = []
+    # output_32bit_array = bitarray.bitarray(output_32bit_array )
 
     s = []
 
@@ -119,8 +133,8 @@ def sboxes(input_48bit):
 
     c = 0  #counter
     for i in input_48bit_array:
-        row = bin_to_int(str(i[0]) + str(i[5]))  #extract the row
-        column = bin_to_int_arr(i[1:5])  #extract the column
+        row = get_row(i)  #extract the row
+        column = get_col(i)  #extract the column
 
         output_32bit_array.append(int_to_bin_4bit(s[c][row][column]))
         c += 1
@@ -128,13 +142,35 @@ def sboxes(input_48bit):
     return output_32bit_array
 
 
+def get_row(bin):
+    n1 = int(bin[0])
+    n2 = int(bin[5])
+
+    num = str(n1) + str(n2)
+
+    return bin_to_int(num)
+
+
+def get_col(bin):
+    n1 = int(bin[1])
+    n2 = int(bin[2])
+    n3 = int(bin[3])
+    n4 = int(bin[4])
+
+    num = str(n1) + str(n2) + str(n3) + str(n4)
+
+    return bin_to_int_arr(num)
+
+
 def permutation(input_bits):
     p = [16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10, 2, 8, 24, 14, 32, 27, 3, 9, 19, 13,
          30, 6, 22, 11, 4, 25]  #hard code the permutation p-box
 
     output_bits = []
+    output_bits = bitarray.bitarray(output_bits)
 
     proper_input = []
+    proper_input = bitarray.bitarray(proper_input)
 
     for i in input_bits:
         for j in i:
@@ -150,7 +186,9 @@ def final_permutation(input_bits):
     fp = [40, 8, 48, 16, 56, 24, 64, 32, 39, 7, 47, 15, 55, 23, 63, 31, 38, 6, 46, 14, 54, 22, 62, 30, 37, 5, 45, 13,
           53, 21, 61, 29, 36, 4, 44, 12, 52, 20, 60, 28, 35, 3, 43, 11, 51, 19, 59, 27, 34, 2, 42, 10, 50, 18, 58, 26,
           33, 1, 41, 9, 49, 17, 57, 25]  #hard code the final-permutation p-box
+
     output_bits = []
+    output_bits = bitarray.bitarray(output_bits)
 
     for i in fp:
         output_bits.append(input_bits[i-1])  #permutate the input
@@ -192,7 +230,7 @@ def int_to_bin_4bit(n):  #function that converts the integer no. to binary in 4 
     else:
         s = s + ''
 
-    return s
+    return bitarray.bitarray(s)
 
 
 def parity_drop(input_64bit):
@@ -200,6 +238,7 @@ def parity_drop(input_64bit):
            63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4]
     '''Hard code the parity drop p-box'''
     output_56bit = []
+    output_56bit = bitarray.bitarray(output_56bit)
 
     for i in pc1:
         output_56bit.append(input_64bit[i - 1])  #perform the permutation
@@ -221,6 +260,7 @@ def compression_pbox(input_56bit):
     pc2 = [14, 17, 11, 24, 1, 5, 3, 28, 15, 6, 21, 10, 23, 19, 12, 4, 26, 8, 16, 7, 27, 20, 13, 2, 41, 52, 31, 37, 47,
            55, 30, 40, 51, 45, 33, 48, 44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32]  #hard code the compression p-box
     output_48bit = []
+    output_48bit = bitarray.bitarray(output_48bit)
 
     for i in pc2:
         output_48bit.append(input_56bit[i - 1])  #perform the permutation
@@ -326,5 +366,3 @@ def hex_to_bin(h):  #function to convert hexadecimal no. to binary
 
     return b
 
-
-jiphy.to.javascript(print('Hello World'))
