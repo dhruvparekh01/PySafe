@@ -1,4 +1,5 @@
 import functions
+import progressbar
 
 
 def DES(input_64bit, cipherkey_64bit):

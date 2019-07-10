@@ -48,13 +48,15 @@ def decrypt(ciphertext, key):
     plaintext = []
     plaintext = bitarray(plaintext)
     count = len(ciphertext)
+    percentage = 0
     no_bytes = count // 8
     no_blocks = no_bytes // 8
+    increment_per_percent = 100 / no_blocks
 
     for i in range(no_blocks-1):
         pi = ciphertext[count-64:count]
         temp = DES_decrypt.decrypt_DES(pi, key)
-
+        percentage += increment_per_percent
         ci = functions.bitarr_xor(temp, ciphertext[count-128:count-64])
         ci.extend(plaintext)
         plaintext = ci
@@ -62,6 +64,8 @@ def decrypt(ciphertext, key):
 
     decrypted = pad.remove_byte_pad(plaintext)
     decrypted = pad.remove_bit_pad(decrypted)
+
+    percentage = 100
 
     return decrypted
 
