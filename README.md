@@ -1,3 +1,5 @@
+Release 2.0 coming soon!!!!
+=======
 # PySafe - Keep your files safe
 
 ![Binary data gif](https://media.giphy.com/media/Q61LJj43H48z1FIK4X/giphy-downsized.gif)
