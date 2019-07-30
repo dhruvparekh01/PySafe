@@ -23,7 +23,7 @@ def byte_pad(in_bytes):
 
     no = len(in_bytes)
     no_of_bytes = no // 8
-    rem = no_of_bytes // 8
+    rem = no_of_bytes % 8
     to_add = 8 - rem
 
     if to_add == 8:
