@@ -3,7 +3,7 @@ func = functions.Functions()
 
 
 def decrypt_DES(ciphertext, k):
-    '''Function to decrypt the ciphertext using DES'''
+    ''' Function to decrypt the ciphertext using DES '''
 
     global func
 
