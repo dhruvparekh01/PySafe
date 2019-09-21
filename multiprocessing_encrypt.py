@@ -210,10 +210,10 @@ if __name__ == "__main__":
         c.extend(i)
 
     if flag == 2:  # if we did decryption, then remove the paddings
-        ciphertext_list = pad.remove_byte_pad(c)
-        ciphertext_list = pad.remove_bit_pad(c)
+        c = pad.remove_byte_pad(c)
+        c = pad.remove_bit_pad(c)
 
-    ciphertext_list = ciphertext_list.tolist()  # convert the bitarray to a python list
+    ciphertext_list = c.tolist()  # convert the bitarray to a python list
     out_bytes = np.packbits(ciphertext_list)
     out_bytes.tofile('Processed files/'+out_name)
 
