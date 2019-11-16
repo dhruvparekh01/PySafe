@@ -1,4 +1,6 @@
 def decimal_to_binary(num, in_bytes):
+    # n = bin(num)[2:].zfill(8)
+    # in_bytes = list(n)
     arr = []
     for i in range(8):
         rem = num % 2

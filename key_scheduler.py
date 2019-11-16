@@ -62,7 +62,7 @@ def compression_pbox(input_56bit):
     output_48bit = bitarray.bitarray(output_48bit)
 
     for i in pc2:
-        output_48bit.append(input_56bit[i - 1])  #perform the permutation
+        output_48bit.append(input_56bit[i - 1])  # perform the permutation
 
     return output_48bit
 

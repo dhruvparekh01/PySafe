@@ -46,15 +46,6 @@ class Functions:
 
         return output_48bit
 
-    def xor(self, a, b):  # make a xor function so that the program has the freedom to xor two strings/ arrays and
-        # output an array
-
-        a = bitarray.bitarray(a)
-
-        c = a ^ b
-
-        return c
-
     def sboxes(self, input_48bit):
         input_48bit_array = []
 
@@ -63,13 +54,13 @@ class Functions:
 
         output_32bit_array = []
 
-        # c = 0  # counter
+        c = 0  # counter
         for i in input_48bit_array:
             row = self.get_row(i)  # extract the row
             column = self.get_col(i)  # extract the column
 
-            output_32bit_array.append(self.s[0][row][column])
-            # c += 1
+            output_32bit_array.append(self.s[c][row][column])
+            c += 1
 
         return output_32bit_array
 
@@ -77,8 +68,8 @@ class Functions:
         n1 = int(bin[0])
         n2 = int(bin[5])
 
-        if n1 == '0':
-            if n2 == '0':
+        if n1 == 0:
+            if n2 == 0:
                 return 0
             else:
                 return 1
@@ -96,7 +87,7 @@ class Functions:
 
         s = str(n1) + str(n2) + str(n3) + str(n4)
 
-        num = self.binary_to_int(s)
+        num = int(s, 2)
         return num
 
     def permutation(self, input_bits):
@@ -112,7 +103,7 @@ class Functions:
                 # usage
 
         for i in self.p:
-            output_bits.append(str(proper_input[i - 1]))  # permutate the input
+            output_bits.append(proper_input[i - 1])  # permutate the input
 
         return output_bits
 
@@ -124,15 +115,4 @@ class Functions:
             output_bits.append(input_bits[i-1])  # permutate the input
 
         return output_bits
-
-    def binary_to_int(self, s):  # function to convert binary no. to integer to give more freedom for the data types
-        s2 = s[::-1]
-
-        n = 0
-        c = 0
-        for i in s2:
-            n += int(i) * 2 ** c
-            c += 1
-
-        return n
 

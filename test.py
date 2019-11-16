@@ -12,6 +12,7 @@ from tkinter.ttk import Combobox
 from tkinter import filedialog
 import hash
 import DES_decrypt
+import test_des
 
 
 obj = functions.Functions()
@@ -96,7 +97,7 @@ if __name__ == "__main__":
         elif selected == 'Medium (default)':
             no_of_processes = 2
         elif selected == 'Fast (High CPU usage)':
-            no_of_processes = 3
+            no_of_processes = 4
 
 
     win.update()
@@ -153,70 +154,29 @@ if __name__ == "__main__":
     for i in range(0, len(plaintext), 64):
         p.append(plaintext[i:i+64])  # Separate the 64 bit blocks
 
-    win.update()
+    pt1 = p[:len(p)//2]
+    pt2 = p[len(p)//2:]
 
-    pool = multiprocessing.Pool(processes=no_of_processes)  #Create a pool object passing the number of processes based on the speed selected by the user
+    win.update()
 
     rkey = key_scheduler.round_key_generator(k)  # Generate the 16 round key and save them here
 
     start = time.time()  # Time tracking to calculate the speed of encryption/decryption
 
-    if flag == 1:
-        abc = partial(DES.des, key=rkey)  # Create a partial
-    else:
-        abc = partial(DES_decrypt.decrypt_DES, k=rkey)
-
-    ciphertext = pool.map_async(abc, p)  # Start asynchronous multiple processes for encryption/decryption as determined by the partial
-
-    pool.close()  # Close the pool object after all the processes finish
-
-    total_tasks = ciphertext._number_left  # Track the number of tasks left to determine the progress
-
-    '''Progress tracking code'''
-    s = '['
-    for i in range(50):
-        s += ' '  # Create 50 blank blocks for initial process start
-
-    perc_old = 0
-    while True:
-        if ciphertext.ready():  # if all the processes are complete, stop the tracking
-            break
-
-        perc_new = int((total_tasks-ciphertext._number_left) / total_tasks * 100)  # Determine the percentage of the encryption/decryption finished
-
-        if perc_new != perc_old:  # if there is a change in percentage completed
-            s = '['
-            for i in range(perc_new//2):  # Add the percentage of process complete/2 '|'s (divided by 2 because the maximum number of '|'s that can be added is 50 not 100)
-                s += '|'
-            for i in range(50-perc_new//2):  # Fill the rest of the blocks with spaces
-                s += ' '
-
-        if flag == 1:
-            l6.config(text='Encrypting... ' + s + ']' + str(perc_new) + '%')
-        else:
-            l6.config(text='Decrypting... ' + s + ']' + str(perc_new) + '%')
-        win.update()
-
-        perc_old = perc_new
+    p1 = multiprocessing.Process(target=test_des.des, args=(pt1, rkey))
+    p2 = multiprocessing.Process(target=test_des.des, args=(pt2, rkey))
+    p1.start()
+    p2.start()
+    p1.join()
+    p2.join()
 
     end = time.time()
     time_taken = end-start
 
     c = bitarray.bitarray([])
 
-    for i in ciphertext.get():  # Flatten the 2d array that contains 64 bit blocks into a continuous 1d array
-        c.extend(i)
-
-    if flag == 2:  # if we did decryption, then remove the paddings
-        c = pad.remove_byte_pad(c)
-        c = pad.remove_bit_pad(c)
-
-    ciphertext_list = c.tolist()  # convert the bitarray to a python list
-    out_bytes = np.packbits(ciphertext_list)
-    out_bytes.tofile('Processed files/'+out_name)
-
     size = len(plaintext)
-    speed = (size/time_taken)/1024
+    speed = (size / time_taken) / 1024
     l6.config(text='Process complete!!. Speed: ' + "{:5.2f}".format(speed) + ' kbps')
     # l6.place(x=50, y=375)
 
