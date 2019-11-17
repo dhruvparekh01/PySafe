@@ -51,7 +51,7 @@ if __name__ == '__main__':
             if ciphertext.ready():  # if all the processes are complete, stop the tracking
                 break
 
-            perc_new = int((total_tasks - ciphertext._number_left) / total_tasks * 100)  # Determine the percentage of the encryption/decryption finished
+            perc_new = int((total_tasks - ciphertext._number_left) / total_tasks * 100)
 
             if perc_new != perc_old:  # if there is a change in percentage completed
                 s = '['
