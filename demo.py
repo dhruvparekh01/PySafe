@@ -17,24 +17,31 @@ if __name__ == '__main__':
         for i in range(0, len(plaintext), 64):
             p.append(plaintext[i:i + 64])  # Separate the 64 bit blocks
 
-        pool = multiprocessing.Pool(processes=Gui.no_of_processes)  # Create a pool object passing the number of processes based on the speed selected by the user
+        # Create a pool object passing the number of processes
+        pool = multiprocessing.Pool(processes=Gui.no_of_processes)
 
-        rkey = key_scheduler.round_key_generator(k)  # Generate the 16 round key and save them here
+        # Generate the 16 round key and save them here
+        rkey = key_scheduler.round_key_generator(k)
 
-        start = time.time()  # Time tracking to calculate the speed of encryption/decryption
+        start = time.time()  # Time tracking to calculate the speed
 
+        # Create a partial
         if Gui.flag == 1:
-            abc = partial(DES.des, key=rkey)  # Create a partial
+            abc = partial(DES.des, key=rkey)
         else:
             abc = partial(DES_decrypt.decrypt_DES, key=rkey)
 
-        ciphertext = pool.map_async(abc, p)  # Start asynchronous multiple processes for encryption/decryption as determined by the partial
+
+        # Start asynchronous multiple processes for encryption/decryption as determined by the partial
+        ciphertext = pool.map_async(abc, p)
 
         pool.close()  # Close the pool object after all the processes finish
 
-        total_tasks = ciphertext._number_left  # Track the number of tasks left to determine the progress
-
         '''Progress tracking code'''
+
+        # Track the number of tasks left to determine the progress
+        total_tasks = ciphertext._number_left
+
         s = '['
         for i in range(50):
             s += ' '  # Create 50 blank blocks for initial process start
@@ -48,9 +55,9 @@ if __name__ == '__main__':
 
             if perc_new != perc_old:  # if there is a change in percentage completed
                 s = '['
-                for i in range(perc_new // 2):  # Add the percentage of process complete/2 '|'s (divided by 2 because the maximum number of '|'s that can be added is 50 not 100)
+                for i in range(perc_new // 2):
                     s += '|'
-                for i in range(50 - perc_new // 2):  # Fill the rest of the blocks with spaces
+                for i in range(50 - perc_new // 2):
                     s += ' '
 
                 if Gui.flag == 1:
@@ -64,12 +71,16 @@ if __name__ == '__main__':
         end = time.time()
         time_taken = end - start
 
+        ''' End of progress tracking '''
+
         c = bitarray([])
 
-        for i in ciphertext.get():  # Flatten the 2d array that contains 64 bit blocks into a continuous 1d array
+         # Flatten the 2d array that contains 64 bit blocks into a continuous 1d array
+        for i in ciphertext.get():
             c.extend(i)
 
-        if Gui.flag == 2:  # if we did decryption, then remove the paddings
+        # if we did decryption, then remove the paddings
+        if Gui.flag == 2:
             c = pad.remove_byte_pad(c)
             c = pad.remove_bit_pad(c)
 
