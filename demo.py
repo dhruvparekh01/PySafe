@@ -12,9 +12,9 @@ if __name__ == '__main__':
 
     k = hash.hash_pass(mywin.password)
 
-    p = []
+    p_text = []
     for i in range(0, len(plaintext), 64):
-        p.append(plaintext[i:i + 64])  # Separate the 64 bit blocks
+        p_text.append(plaintext[i:i + 64])  # Separate the 64 bit blocks
 
     # Create a pool object passing the number of processes
     pool = multiprocessing.Pool(processes=mywin.no_of_processes)
@@ -26,13 +26,13 @@ if __name__ == '__main__':
 
     # Create a partial
     if mywin.flag == 1:
-        abc = partial(DES.des, key=rkey)
+        cipher = partial(DES.des, key=rkey)
     else:
-        abc = partial(DES_decrypt.decrypt_DES, key=rkey)
+        cipher = partial(DES_decrypt.decrypt_DES, key=rkey)
 
 
     # Start asynchronous multiple processes for encryption/decryption as determined by the partial
-    ciphertext = pool.map_async(abc, p)
+    ciphertext = pool.map_async(cipher, p_text)
 
     pool.close()  # Close the pool object after all the processes finish
 
