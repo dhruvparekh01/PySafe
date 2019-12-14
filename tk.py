@@ -102,11 +102,12 @@ class Gui:
 if __name__ == '__main__':
     window = Tk()
     mywin = Gui(window)
-    window.title('Encryption')
+    window.title('PySafe')
     window.geometry("300x450")
 
     while mywin.flag == 0:
         window.update()
+        time.sleep(0.1)
 
     plaintext = pad.bit_pad(mywin.plaintext)
     plaintext = pad.byte_pad(plaintext)
@@ -160,6 +161,7 @@ if __name__ == '__main__':
             window.update()
 
         perc_old = perc_new
+        time.sleep(1)
 
     end = time.time()
     time_taken = end - start
