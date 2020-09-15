@@ -1,0 +1,3 @@
+./venv/*
+./"Processed Files"/*
+./__pycache__/*

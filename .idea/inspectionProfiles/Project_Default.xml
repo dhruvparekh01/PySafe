@@ -26,6 +26,13 @@
       </option>
     </inspection_tool>
     <inspection_tool class="PyPropertyAccessInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="multiprocessing.pool.MapResult._number_left" />
+        </list>
+      </option>
+    </inspection_tool>
     <inspection_tool class="TsLint" enabled="true" level="WARNING" enabled_by_default="true" />
   </profile>
 </component>
