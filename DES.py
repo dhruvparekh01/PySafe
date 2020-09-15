@@ -19,14 +19,13 @@ def des(input_64bit, key):
 
     for i in range(16):  # 16 des round involving multiple steps
         new_left = right
-        new_right = obj.xor(left, obj.round_func(right, key[i]))  # perform the round function
+        new_right = left ^ obj.round_func(right, key[i])  # perform the round function
         right = new_right
         left = new_left
 
     right.extend(left)  # combine the two blocks
 
     ciphertext = obj.final_permutation(right)  # perform the final permutation
-
 
     return ciphertext
 

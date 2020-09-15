@@ -2,8 +2,8 @@ import functions
 func = functions.Functions()
 
 
-def decrypt_DES(ciphertext, k):
-    '''Function to decrypt the ciphertext using DES'''
+def decrypt_DES(ciphertext, key):
+    ''' Function to decrypt the ciphertext using DES '''
 
     global func
 
@@ -16,7 +16,7 @@ def decrypt_DES(ciphertext, k):
 
     for i in range(16):  #16 des round involving multiple steps but in reverse order for decryption
         new_left = right
-        new_right = func.xor(left, func.round_func(right, k[15-i]))  #perform the round function
+        new_right = left ^ func.round_func(right, key[15 - i]) #perform the round function
         left = new_left
         right = new_right
 

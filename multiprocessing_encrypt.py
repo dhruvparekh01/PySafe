@@ -16,7 +16,6 @@ import DES_decrypt
 
 obj = functions.Functions()
 
-
 if __name__ == "__main__":
     win = Tk()
     win.geometry("300x450")
@@ -24,7 +23,7 @@ if __name__ == "__main__":
     fun = functions.Functions()
 
     plaintext = bitarray.bitarray([])
-    flag = 0
+    flag = 0  # flag=0:incomplete parameters, flag=1:Encrypt, flag=2:Decrypt
     no_of_processes = 0
     file_selected = 0
     data_checked = False
@@ -95,9 +94,9 @@ if __name__ == "__main__":
         if selected == 'Slow (Low CPU usage)':
             no_of_processes = 1
         elif selected == 'Medium (default)':
-            no_of_processes = 3
+            no_of_processes = 2
         elif selected == 'Fast (High CPU usage)':
-            no_of_processes = 6
+            no_of_processes = 3
 
 
     win.update()
@@ -145,50 +144,51 @@ if __name__ == "__main__":
     def demo():
         win.update()
 
-    k = hash.hash_pass(password)
+    k = hash.hash_pass(password)  #hash the password using the SHA-256 provided by the hash library to generate a secure 64 bit key
 
-    plaintext = pad.bit_pad(plaintext)
-    plaintext = pad.byte_pad(plaintext)
+    plaintext = pad.bit_pad(plaintext)  # Pad the plaintext to the nearest byte, ie make the total number of bits, multiple of 8
+    plaintext = pad.byte_pad(plaintext)  # Pad the plaintext to make it into 64 bit blocks
 
     p = []
     for i in range(0, len(plaintext), 64):
-        p.append(plaintext[i:i+64])
+        p.append(plaintext[i:i+64])  # Separate the 64 bit blocks
 
     win.update()
 
-    pool = multiprocessing.Pool(processes=no_of_processes)
+    pool = multiprocessing.Pool(processes=no_of_processes)  #Create a pool object passing the number of processes based on the speed selected by the user
 
-    rkey = key_scheduler.round_key_generator(k)
+    rkey = key_scheduler.round_key_generator(k)  # Generate the 16 round key and save them here
 
-    start = time.time()
+    start = time.time()  # Time tracking to calculate the speed of encryption/decryption
 
     if flag == 1:
-        abc = partial(DES.des, key=rkey)
+        abc = partial(DES.des, key=rkey)  # Create a partial
     else:
         abc = partial(DES_decrypt.decrypt_DES, k=rkey)
 
-    ciphertext = pool.map_async(abc, p)
-    pool.close()
+    ciphertext = pool.map_async(abc, p)  # Start asynchronous multiple processes for encryption/decryption as determined by the partial
 
-    total_tasks = ciphertext._number_left
+    pool.close()  # Close the pool object after all the processes finish
 
+    total_tasks = ciphertext._number_left  # Track the number of tasks left to determine the progress
+
+    '''Progress tracking code'''
     s = '['
     for i in range(50):
-        s += ' '
+        s += ' '  # Create 50 blank blocks for initial process start
 
     perc_old = 0
     while True:
-        if ciphertext.ready():
+        if ciphertext.ready():  # if all the processes are complete, stop the tracking
             break
-        # print(str(ciphertext._number_left))
-        perc_new = int((total_tasks-ciphertext._number_left) / total_tasks * 100)
-        # l6.config(text=perc)
-        # win.update()
-        if perc_new != perc_old:
+
+        perc_new = int((total_tasks-ciphertext._number_left) / total_tasks * 100)  # Determine the percentage of the encryption/decryption finished
+
+        if perc_new != perc_old:  # if there is a change in percentage completed
             s = '['
-            for i in range(perc_new//2):
+            for i in range(perc_new//2):  # Add the percentage of process complete/2 '|'s (divided by 2 because the maximum number of '|'s that can be added is 50 not 100)
                 s += '|'
-            for i in range(50-perc_new//2):
+            for i in range(50-perc_new//2):  # Fill the rest of the blocks with spaces
                 s += ' '
 
         if flag == 1:
@@ -204,12 +204,14 @@ if __name__ == "__main__":
 
     c = bitarray.bitarray([])
 
-    for i in ciphertext.get():
+    for i in ciphertext.get():  # Flatten the 2d array that contains 64 bit blocks into a continuous 1d array
         c.extend(i)
 
-    # print(c)
+    if flag == 2:  # if we did decryption, then remove the paddings
+        c = pad.remove_byte_pad(c)
+        c = pad.remove_bit_pad(c)
 
-    ciphertext_list = c.tolist()
+    ciphertext_list = c.tolist()  # convert the bitarray to a python list
     out_bytes = np.packbits(ciphertext_list)
     out_bytes.tofile('Processed files/'+out_name)
 

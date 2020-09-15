@@ -38,24 +38,8 @@ def s_boxes():
                            [2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11]])
 
     def to_bin(n):  # function that converts the integer no. to binary in 4 bits (used for the s-boxes)
-        rev = 0
-        i = 0
-        while n > 0:
-            rem = n % 2
-            rev = rem * (10 ** i) + rev
-            n = int(n // 2)
-            i += 1
-
-        s = str(rev)
-
-        if len(s) == 1:
-            s = '000' + s
-        elif len(s) == 2:
-            s = '00' + s
-        elif len(s) == 3:
-            s = '0' + s
-        else:
-            s = s + ''
+        s = "{0:b}".format(n)
+        s = s.zfill(4)
 
         return bitarray.bitarray(s)
 
